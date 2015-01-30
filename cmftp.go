@@ -26,7 +26,7 @@ func main() {
 	if *verbose {
 		fmt.Println("port: ", port)
 	}
-	log.Print("hej", *verbose)
+	log.Println("cmftp started. (Verbose: ", *verbose, ")")
 	// Logger
 	logChan := make(chan string)
 	go logMessages(logChan)
@@ -56,7 +56,7 @@ func handleConnection(c net.Conn, logChan chan<- string) {
 		admin:      true,
 	}
 	if strings.TrimSpace(client.username) == "" {
-		io.WriteString(c, "Invalid Username\n")
+		io.WriteString(c, "332 Need account for login.\n")
 		return
 	}
 
@@ -72,15 +72,17 @@ func handleConnection(c net.Conn, logChan chan<- string) {
 
 	// I/O
 	go client.ReadLinesInto(logChan)
+	// Echo back
 	client.WriteLinesFrom(client.channel)
 }
 
 func promtLogin(c net.Conn, bufc *bufio.Reader) string {
 	io.WriteString(c, "220 FTP Server ready.\n")
 	io.WriteString(c, "Username: ")
-	username, err := bufc.ReadString('\n')
+	username, _, err := bufc.ReadLine()
 	if err == nil {
-		io.WriteString(c, "331 User "+username+" OK. Password required")
+		// TODO: check username in user list
+		io.WriteString(c, "331 User "+string(username)+" OK. Password required\n")
 		passwd, _ := bufc.ReadString('\n')
 		log.Println("Passwd: " + passwd)
 	}
@@ -89,6 +91,6 @@ func promtLogin(c net.Conn, bufc *bufio.Reader) string {
 
 func logMessages(logChan <-chan string) {
 	for msg := range logChan {
-		log.Printf("client msg : %s", msg)
+		log.Printf("%s", msg)
 	}
 }

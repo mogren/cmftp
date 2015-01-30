@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"strings"
 )
 
 type Client struct {
@@ -21,6 +22,10 @@ func (c Client) ReadLinesInto(ch chan<- string) {
 		line, err := bufc.ReadString('\n')
 		if err != nil {
 			break
+		}
+		if strings.HasPrefix(line, "/quit") {
+			c.connection.Close()
+			return
 		}
 		ch <- fmt.Sprintf("%s: %s", c.username, line)
 	}
