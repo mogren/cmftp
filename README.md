@@ -4,13 +4,12 @@ The aim is to have a simple ftp-server that can run in userspace and have limite
 
 ### Design goals
 
- * Handle the minimum required for FTP according to RFC-959
- * Run in userspace, listen on pårt 2121 (or other)
- * Virtual users restricted to a subdirectory and file quota
- * Configurable via config file (TOML) and web interface
- 
+ * Handle the minimum required for FTP according to [RFC-959](http://tools.ietf.org/html/rfc959)
+ * Run in userspace, listen on port 2121 (or other port over 1024)
+ * Virtual users, restricted to subdirectories with a per user and total file quota.
+ * Configurable via config file (probably [TOML](https://github.com/toml-lang/toml)) and web interface
 
-To compile:
+#### To compile:
 ```
 make
 ```
