@@ -18,3 +18,8 @@ To run:
 
 ```
 > ./cmftp
+```
+
+### Possible future additions
+ * FTP Security via TLS according to [RFC-2228](http://tools.ietf.org/html/rfc2228)
+ * IPv6 and NAT support according to [RFC-2428](http://tools.ietf.org/html/rfc2428)
