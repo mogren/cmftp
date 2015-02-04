@@ -21,15 +21,18 @@ type Client struct {
 func (c Client) ReadLinesInto(ch chan<- string) {
 	bufc := bufio.NewReader(c.connection)
 	for {
-		line, err := bufc.ReadLine() //bufc.ReadString('\n')
+		line, _, err := bufc.ReadLine() //bufc.ReadString('\n')
 		if err != nil {
 			break
 		}
-		if strings.HasPrefix(line, "/quit") {
+		str = string(line)
+		if strings.HasPrefix(str, "/quit") {
 			c.connection.Close()
 			return
 		}
-		ch <- fmt.Sprintf("%s: %s", c.username, line)
+		if strings.TrimSpace(str) != "" {
+			ch <- fmt.Sprintf("%s: %s", c.username, str)
+		}
 	}
 }
 

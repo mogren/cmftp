@@ -12,6 +12,9 @@ import (
 	"strings"
 )
 
+const ADMIN_NAME string = "admin"
+const ADMIN_PWD string = "password"
+
 func main() {
 	var (
 		iport   = flag.Int("port", 2121, "FTP server port. (1024 – 49151)")
@@ -56,7 +59,6 @@ func handleConnection(c net.Conn, logChan chan<- string) {
 		admin:      true,
 	}
 	if strings.TrimSpace(client.username) == "" {
-		io.WriteString(c, "332 Need account for login.\n")
 		return
 	}
 
@@ -80,13 +82,24 @@ func promtLogin(c net.Conn, bufc *bufio.Reader) string {
 	io.WriteString(c, "220 FTP Server ready.\n")
 	io.WriteString(c, "Username: ")
 	username, _, err := bufc.ReadLine()
+	ret := string(username)
 	if err == nil {
 		// TODO: check username in user list
-		io.WriteString(c, "331 User "+string(username)+" OK. Password required\n")
-		passwd, _ := bufc.ReadString('\n')
-		log.Println("Passwd: " + passwd)
+		if ret != ADMIN_NAME {
+			io.WriteString(c, "332 Username "+ret+" not found\n")
+			return ""
+		} else {
+			io.WriteString(c, "331 User "+ret+" OK. Password required\n")
+			passwd, _, err := bufc.ReadLine()
+			log.Println("Passwd: " + string(passwd))
+			if err != nil || string(passwd) != ADMIN_PWD {
+				io.WriteString(c, "530 Not logged in.\n")
+				return ""
+			}
+		}
 	}
-	return string(username)
+	log.Println("ret: " + ret)
+	return ret
 }
 
 func logMessages(logChan <-chan string) {
