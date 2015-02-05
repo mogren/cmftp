@@ -25,8 +25,9 @@ func (c Client) ReadLinesInto(ch chan<- string) {
 		if err != nil {
 			break
 		}
+		//fmt.Printf("debug input: %v, %s, %x \n", line, line, line)
 		str = string(line)
-		if strings.HasPrefix(str, "/quit") {
+		if int(line[0]) == 4 || strings.HasPrefix(str, "/quit") {
 			c.connection.Close()
 			return
 		}
