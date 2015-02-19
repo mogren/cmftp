@@ -21,17 +21,21 @@ type Client struct {
 func (c Client) ReadLinesInto(ch chan<- string) {
 	bufc := bufio.NewReader(c.connection)
 	for {
-		line, _, err := bufc.ReadLine() //bufc.ReadString('\n')
+		line, _, err := bufc.ReadLine()
 		if err != nil {
 			break
 		}
 		//fmt.Printf("debug input: %v, %s, %x \n", line, line, line)
 		str = string(line)
-		if int(line[0]) == 4 || strings.HasPrefix(str, "/quit") {
+		if str != "" && (int(line[0]) == 4 || strings.HasPrefix(str, "/quit")) {
 			c.connection.Close()
 			return
 		}
-		if strings.TrimSpace(str) != "" {
+		cmd := strings.TrimSpace(str)
+		if cmd != "" {
+			// Execute command?
+			result := RunCommand(cmd)
+			fmt.Println(result)
 			ch <- fmt.Sprintf("%s: %s", c.username, str)
 		}
 	}
