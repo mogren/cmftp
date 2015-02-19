@@ -34,7 +34,7 @@ func (c Client) ReadLinesInto(ch chan<- string) {
 		cmd := strings.TrimSpace(str)
 		if cmd != "" {
 			// Execute command?
-			result := RunCommand(cmd)
+			result := c.RunCommand(cmd)
 			fmt.Println(result)
 			ch <- fmt.Sprintf("%s: %s", c.username, str)
 		}
